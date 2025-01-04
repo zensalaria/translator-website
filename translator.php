@@ -203,12 +203,13 @@ function translateText($text, $lang) {
             messageInput.value = '';
 
             // Send AJAX request
+            // Send AJAX request
             fetch('translation.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: message=${encodeURIComponent(message)}&target_lang=${encodeURIComponent(lang)}
+                body: `message=${encodeURIComponent(message)}&target_lang=${encodeURIComponent(lang)}` // Use backticks here
             })
             .then(response => response.json())
             .then(data => {
@@ -222,6 +223,7 @@ function translateText($text, $lang) {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             })
             .catch(error => console.error('Error:', error));
+
         });
 
         function appendMessage(sender, message) {
