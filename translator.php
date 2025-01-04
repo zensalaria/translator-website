@@ -208,7 +208,7 @@ function translateText($text, $lang) {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `message=${encodeURIComponent(message)}&target_lang=${encodeURIComponent(lang)}`
+                body: message=${encodeURIComponent(message)}&target_lang=${encodeURIComponent(lang)}
             })
             .then(response => response.json())
             .then(data => {
