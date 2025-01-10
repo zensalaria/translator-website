@@ -1,0 +1,36 @@
+services:
+  php:
+    image: php:7.4-fpm
+    container_name: ubuntu-php-1
+    volumes:
+      - ./www:/var/www/html
+    networks:
+      - app-network
+
+  web:
+    image: nginx:latest
+    container_name: ubuntu-web-1
+    ports:
+      - "80:80"    # HTTP port
+      - "443:443"  # HTTPS port
+    volumes:
+      - ./www:/var/www/html:rw
+      - ./default.conf:/etc/nginx/conf.d/default.conf:rw
+      - ./certs:/etc/letsencrypt:rw  # Mount SSL certificates
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  flask-api:
+    build:
+      context: .
+      dockerfile: flask-api/Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
