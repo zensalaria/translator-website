@@ -30,9 +30,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
 
 // Function to simulate translation (replace with actual NLLB integration)
 function translateText($text, $lang) {
-    // TODO: Integrate your NLLB translation API here
-    return "Translated to {$lang}: " . htmlspecialchars($text);
+    $escapedText = escapeshellarg($text);
+    $escapedLang = escapeshellarg($lang);
+
+    // Call Python script with escaped input text and target language
+    $command = "python3 /app/hugging_face_api.py $escapedText $escapedLang";
+
+    // Execute the command
+    $output = shell_exec($command);
+    if ($output === null) {
+        error_log("Error: Translation script failed.\n");
+    } else {
+        error_log("Translation Output: " . $output . "\n");
+    }
+    return trim($output); // Return the translation
 }
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -145,14 +160,14 @@ function translateText($text, $lang) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="translation.php">Translator</a>
+            <a class="navbar-brand" href="translator.php">Translator</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="translation.php">Home</a>
+                        <a class="nav-link" href="translator.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="metrics.php">Metrics</a>
@@ -177,6 +192,7 @@ function translateText($text, $lang) {
         <div class="chat-input">
             <textarea id="messageInput" rows="1" placeholder="Type your message..."></textarea>
             <select id="targetLang">
+                <option value="urd_Arab" selected>Urdu</option>
                 <option value="es">Spanish</option>
                 <option value="fr">French</option>
                 <option value="de">German</option>
@@ -204,7 +220,7 @@ function translateText($text, $lang) {
 
             // Send AJAX request
             // Send AJAX request
-            fetch('translation.php', {
+            fetch('translator.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
